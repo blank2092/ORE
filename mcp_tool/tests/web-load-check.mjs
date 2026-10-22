@@ -1,0 +1,31 @@
+// Opens a file saved by MCP through the web editor's real 📂 load (file input change event) and checks that the web export equals the headless export
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import { loadOre } from '../src/ore-headless.mjs';
+const require = createRequire(import.meta.url);
+const { JSDOM, VirtualConsole } = require('jsdom');
+import { fileURLToPath } from 'node:url';
+const HTML = fileURLToPath(new URL('../../html/ore_vfx_editor.html', import.meta.url));
+const file = process.argv[2] || fileURLToPath(new URL('./.tmp/saved-fire.txt', import.meta.url));
+const txt = fs.readFileSync(file, 'utf8');
+const errors = []; const vc = new VirtualConsole(); vc.on('jsdomError', e => errors.push(String(e.stack || e))); vc.on('error', (...a) => errors.push(a.join(' ')));
+const dom = new JSDOM(fs.readFileSync(HTML, 'utf8'), { runScripts: 'dangerously', pretendToBeVisual: true, virtualConsole: vc, beforeParse(w) {
+  w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => k === 'createImageData' || k === 'getImageData' ? (a, b) => ({ data: new Uint8ClampedArray(Math.max(1, (a.width || a) * (b || 1)) * 4) }) : k === 'canvas' ? {} : () => {}, set: () => true });
+  w.matchMedia = q => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} });
+  w.Element.prototype.scrollIntoView = () => {}; w.confirm = () => true; } });
+const w = dom.window;
+await new Promise(r => setTimeout(r, 200));
+const input = w.document.getElementById('load-progress-input');
+Object.defineProperty(input, 'files', { value: [new w.File([txt], 'fire.txt', { type: 'text/plain' })] });
+input.dispatchEvent(new w.Event('change'));
+await new Promise(r => setTimeout(r, 500));
+const tabs = w.OreTabs.count(), active = w.document.getElementById('fn-input').value;
+const domNodes = w.document.querySelectorAll('#nodes-layer .node').length;
+w.eval('_ctxShortMap=new Map()');
+const webR = JSON.parse(w.eval(`JSON.stringify(generateAllParticleJSONs('ore:'+document.getElementById('fn-input').value).results.map(x=>x.json))`));
+const ore = loadOre(); const snap = JSON.parse(txt);
+const hr = ore.compile({ nodes: snap.nodes, wires: snap.wires, nextId: snap.nextId }, 'ore:' + active);
+console.log('web tabs', tabs, '· open tab', active, '· nodes on screen', domNodes, '/', Object.keys(snap.nodes).length);
+console.log('web export = MCP (headless) export:', JSON.stringify(webR) === JSON.stringify(hr.results.map(x => x.json)));
+console.log('page errors:', errors.length ? errors.slice(0, 3) : 'none');
+w.close(); process.exit(JSON.stringify(webR) === JSON.stringify(hr.results.map(x => x.json)) && !errors.length ? 0 : 1);

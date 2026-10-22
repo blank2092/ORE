@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ORE — Bedrock VFX Node Editor</title>
+<meta name="description" content="A node editor for Minecraft Bedrock particles, plus an MCP tool that lets AI apps edit the same graphs.">
+<style>
+  :root{
+    --bg:#1a1a1a; --panel:#262626; --panel-2:#303030; --line:#3a3a3a; --text:#ececec; --mid:#b0b0b0; --dim:#8a8a8a;
+    --ore:#ff9d4d; --ore-deep:#c9631f; --sel:#4aa3ff;
+    --mono:'IBM Plex Mono','SF Mono',Consolas,monospace;
+    --sans:'Segoe UI','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important} /* .btn sets display, which would otherwise override hidden */
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.55}
+  body{min-height:100vh;display:flex;flex-direction:column}
+  a{color:var(--sel)}
+  main{width:100%;max-width:960px;margin:0 auto;padding:56px 16px 32px;flex:1}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{width:44px;height:44px;border-radius:9px;background:linear-gradient(140deg,var(--ore),var(--ore-deep));
+    display:flex;align-items:center;justify-content:center;font:700 16px var(--mono);color:#1a0d02;flex:none}
+  h1{margin:0;font-size:28px;letter-spacing:.02em}
+  .ver{font:600 11px var(--mono);color:var(--dim);letter-spacing:.06em}
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+  .lang button{background:var(--panel);color:var(--dim);border:0;padding:6px 10px;font:600 12px var(--sans);cursor:pointer}
+  .lang button[aria-pressed="true"]{background:var(--panel-2);color:var(--text)}
+  .lang button:focus-visible{outline:2px solid var(--sel);outline-offset:-2px}
+  .lead{color:var(--mid);margin:6px 0 36px;max-width:640px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:720px){ .cards{grid-template-columns:1fr} main{padding-top:36px} }
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;display:flex;flex-direction:column;gap:12px}
+  .card h2{margin:0;font-size:18px}
+  .tag{display:inline-block;font:600 10.5px var(--mono);letter-spacing:.05em;padding:2px 8px;border-radius:10px;
+    background:var(--panel-2);color:var(--mid);border:1px solid var(--line);margin-left:6px;vertical-align:2px}
+  .card p{margin:0;color:var(--mid);font-size:14px}
+  .card ol{margin:0;padding-left:20px;color:var(--mid);font-size:14px}
+  .card ol li{margin:3px 0}
+  code{font:12.5px var(--mono);background:#1c1c1c;border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--text)}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:6px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:6px;font:600 14px var(--sans);
+    text-decoration:none;border:1px solid var(--line);background:var(--panel-2);color:var(--text)}
+  .btn:hover{border-color:#5a5a5a}
+  .btn.primary{background:var(--ore);border-color:var(--ore);color:#241203}
+  .btn.primary:hover{background:#ffb37a}
+  .btn:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+  .note{font-size:12.5px;color:var(--dim)}
+  footer{max-width:960px;width:100%;margin:0 auto;padding:18px 16px 28px;color:var(--dim);font-size:12.5px;
+    display:flex;flex-wrap:wrap;gap:6px 16px;border-top:1px solid #242424}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">Ore</div>
+      <div>
+        <h1>ORE</h1>
+        <div class="ver">BEDROCK VFX NODE EDITOR · v1.1.5</div>
+      </div>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+  <p class="lead" data-i18n="lead">Build Minecraft Bedrock Edition particles with a node graph. Connect nodes, and ORE writes the Bedrock particle JSON (Molang) and a resource pack (.mcpack) for you.</p>
+
+  <div class="cards">
+    <section class="card">
+      <h2><span data-i18n="webTitle">Web editor</span><span class="tag" data-i18n="webTag">No install</span></h2>
+      <p data-i18n="webText">Edit node graphs right in your browser, check them in the 3D preview, then export JSON or a .mcpack. Save your work to a file with 💾. Available in English and Korean.</p>
+      <div class="actions">
+        <a class="btn primary" href="./html/ore_vfx_editor.html" data-i18n="webOpen">Open the web editor →</a>
+      </div>
+      <p class="note" data-i18n="webNote">Works best in an up-to-date browser such as Chrome or Edge. Works on PC and mobile.</p>
+    </section>
+
+    <section class="card">
+      <h2><span data-i18n="mcpTitle">MCP tool</span><span class="tag" data-i18n="mcpTag">Install on your PC</span></h2>
+      <p data-i18n="mcpText">Lets AI apps such as Claude Desktop or Claude Code build and edit the same node graphs. It uses the same compiler as the web editor, and the results open in the web editor as they are.</p>
+      <ol>
+        <li data-i18n="mcpStep1">Install <a href="https://nodejs.org/">Node.js</a> 20.3 or later</li>
+        <li data-i18n="mcpStep2">Download the source ZIP, unzip it and run <code>npm install</code> in the <code>mcp_tool</code> folder</li>
+        <li data-i18n="mcpStep3">Register <code>mcp_tool/src/server.mjs</code> in your AI app's settings</li>
+      </ol>
+      <div class="actions">
+        <a class="btn" id="mcp-guide" href="./mcp_tool/README.md" data-i18n="mcpGuide">Setup guide</a>
+        <a class="btn" id="mcp-zip" href="#" hidden data-i18n="mcpZip">Download source ZIP</a>
+      </div>
+    </section>
+  </div>
+</main>
+<footer>
+  <span>MIT License © 2026 ORE contributors</span>
+  <a id="repo-link" href="#" hidden data-i18n="repo">GitHub repository</a>
+</footer>
+<script>
+// Language: English by default; the choice is saved as "ore.lang", the same setting the editor uses,
+// so picking a language here also opens the editor in that language (same site).
+var KO = {
+  lead: '마인크래프트 베드락 에디션 파티클을 노드 그래프로 만듭니다. 노드를 연결하면 Bedrock 파티클 JSON(Molang)과 리소스팩(.mcpack)이 만들어집니다.',
+  webTitle: '웹 에디터', webTag: '설치 없음',
+  webText: '브라우저에서 바로 노드 그래프를 편집하고, 3D 미리보기로 확인한 뒤 JSON이나 .mcpack으로 내보냅니다. 작업 내용은 💾로 파일에 저장합니다. 영어와 한국어를 지원합니다.',
+  webOpen: '웹 에디터 열기 →', webNote: 'Chrome · Edge 등 최신 브라우저 권장. PC와 모바일 모두 지원합니다.',
+  mcpTitle: 'MCP 도구', mcpTag: 'PC에 설치',
+  mcpText: 'Claude Desktop · Claude Code 같은 AI 앱이 같은 노드 그래프를 만들고 고칩니다. 웹 에디터와 같은 컴파일러를 쓰고, 결과는 웹 에디터에서 그대로 열립니다.',
+  mcpStep1: '<a href="https://nodejs.org/">Node.js</a> 20.3 이상 설치',
+  mcpStep2: '소스 ZIP을 받아 압축을 풀고 <code>mcp_tool</code> 폴더에서 <code>npm install</code>',
+  mcpStep3: 'AI 앱 설정에 <code>mcp_tool/src/server.mjs</code> 등록',
+  mcpGuide: '설치 안내', mcpZip: '소스 ZIP 받기', repo: 'GitHub 저장소'
+};
+var EN = {};
+document.querySelectorAll('[data-i18n]').forEach(function (el) { EN[el.getAttribute('data-i18n')] = el.innerHTML; });
+
+// On GitHub Pages (https://user.github.io/repo/), link the guide and ZIP to the repository.
+// Elsewhere (opened as a file), keep the default link to the README inside the repository.
+var repoBase = null;
+(function () {
+  var m = /^([^.]+)\.github\.io$/i.exec(location.hostname);
+  if (!m) return;
+  var seg = location.pathname.split('/').filter(Boolean)[0];
+  var repo = seg && !/\.html?$/i.test(seg) ? seg : location.hostname;
+  repoBase = 'https://github.com/' + m[1] + '/' + repo;
+  var zip = document.getElementById('mcp-zip'); zip.href = repoBase + '/archive/refs/heads/main.zip'; zip.hidden = false;
+  var rl = document.getElementById('repo-link'); rl.href = repoBase; rl.hidden = false;
+})();
+
+function setLang(lang) {
+  var T = lang === 'ko' ? KO : EN;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function (el) { var k = el.getAttribute('data-i18n'); if (T[k] !== undefined) el.innerHTML = T[k]; });
+  document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
+  var guide = document.getElementById('mcp-guide');
+  guide.href = repoBase ? repoBase + (lang === 'ko' ? '/blob/main/mcp_tool/README.ko.md' : '/tree/main/mcp_tool#readme')
+                        : (lang === 'ko' ? './mcp_tool/README.ko.md' : './mcp_tool/README.md');
+  try { localStorage.setItem('ore.lang', lang); } catch (e) {}
+}
+document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.getAttribute('data-lang')); }); });
+var saved = null; try { saved = localStorage.getItem('ore.lang'); } catch (e) {}
+setLang(saved === 'ko' ? 'ko' : 'en');
+</script>
+</body>
+</html>

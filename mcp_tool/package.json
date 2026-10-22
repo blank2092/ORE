@@ -1,0 +1,32 @@
+{
+  "name": "ore-vfx-mcp",
+  "version": "1.1.5",
+  "description": "ORE Bedrock VFX Node Editor의 MCP 서버 — AI가 노드 그래프를 편집하고 웹 에디터와 같은 컴파일러로 Bedrock 파티클 JSON을 만든다",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.3"
+  },
+  "bin": {
+    "ore-vfx-mcp": "src/server.mjs"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "sync": "node tools/sync-core.mjs",
+    "smoke": "node tests/smoke.mjs",
+    "check": "node tests/selfcheck.mjs && node tests/web-load-check.mjs",
+    "test": "node tools/sync-core.mjs --check && node tests/compare.mjs && npm run test:i18n && npm run check",
+    "test:i18n": "node tools/i18n-missing.mjs && node tests/i18n-messages.mjs && node tests/i18n-check.mjs",
+    "i18n:missing": "node tools/i18n-missing.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.3.1",
+    "acorn": "^8.15.0",
+    "jsdom": "^24.0.0"
+  }
+}

@@ -1,0 +1,106 @@
+{
+ "emitter": {
+  "name": "Emitter",
+  "desc": "Particle count, lifetime and ID encoding"
+ },
+ "shape_image_contour": {
+  "name": "Shape (Image Contour)",
+  "desc": "Upload an image → trace its outline (by brightness, alpha or an RGB channel) → turn it into a formula with Elliptic Fourier Descriptors. Outputs x/y/z — lays particles out in the shape of a logo, text or silhouette"
+ },
+ "noise3d": {
+  "name": "Noise 3D",
+  "desc": "Choose Perlin, Simplex, Voronoi or FBM. Takes x/y/z and outputs a noise value n. It works out where it is connected automatically (on offset it is computed once; on tint/size it is recomputed for every particle). The node shows the pattern as a black-and-white image"
+ },
+ "curlnoise": {
+  "name": "Curl Noise",
+  "desc": "Divergence-free (incompressible) noise vector field — outputs a force fx/fy/fz. Use it for fluid-like swirling motion such as smoke, fire and eddies. The flow option makes the pattern drift over time. The preview shows the field as arrows"
+ },
+ "vecfield_image": {
+  "name": "Vector Field (Image)",
+  "desc": "A custom vector field baked onto a grid from an uploaded image — outputs a force fx/fy. Three modes: brightness gradient, mask edge, or RGB flow map. Use it to make particles flow along a logo, pattern or custom shape"
+ },
+ "curlturb": {
+  "name": "Turbulence (Curl FBM)",
+  "desc": "Curl Noise stacked over several octaves for multi-scale turbulence — outputs a force fx/fy/fz. Same idea as Houdini POP Turbulence and Unity VFX Graph \"Turbulence\". Small details ride on top of big swirls, giving complex smoke- or cloud-like motion. The flow option makes it drift over time"
+ },
+ "vortexfield": {
+  "name": "Vortex Field",
+  "desc": "Swirling flow around an axis (viscous coupling + centripetal pull) — outputs fx/fy/fz. Same idea as Unity VFX Graph \"Vortex\" and Unreal Niagara \"Vortex Velocity Force\". For typhoons, tornadoes and particles being sucked into a whirl. The pulse option makes the strength throb periodically"
+ },
+ "attractorfield": {
+  "name": "Attractor / Point Force",
+  "desc": "Pulls particles toward a point (+) or pushes them away (−) — outputs fx/fy/fz. Same as Unity \"Sphere Attraction\" and Niagara \"Point Attraction Force\". For implosions, collect effects and magnets. The pulse option makes the strength beat like a heart"
+ },
+ "directionalfield": {
+  "name": "Directional Force",
+  "desc": "A constant push in one direction (gravity or wind) — outputs fx/fy/fz. Same as Niagara \"Gravity Force\" / \"Wind Force\". The basic force for falling or wind-blown effects. The gust option varies the strength over time"
+ },
+ "windzone": {
+  "name": "Wind Zone",
+  "desc": "Local wind that blows only inside a box or sphere — outputs fx/fy/fz. Same as Unity \"Wind Zone\" and Niagara's volume-limited Wind Force. Use it for wind in one area only (a draft through a window, a local gust). The gust option varies the strength; together with turbulence both direction and strength waver naturally"
+ },
+ "wall": {
+  "name": "Wall · collision",
+  "desc": "Keeps particles inside box walls (min/max) and bounces them off — input x/y/z → output x/y/z. Set friction and bounce per wall (bouncy like a slime block); the eye icon shows the walls in the 3D preview. Place it between a position output (Shape, Noise…) and the Output offset."
+ },
+ "dragfield": {
+  "name": "Drag / Damping",
+  "desc": "Outputs a drag coefficient (based on Bedrock's linear_drag_coefficient; same idea as Niagara \"Drag Force\"). Note: Output has no drag socket — this editor moves particles by formula, not by the engine's physics — so the value only works as a plain number you feed into other nodes (for example a Formula)"
+ },
+ "buoyancyfield": {
+  "name": "Buoyancy",
+  "desc": "Buoyancy from a temperature difference (T − T_ambient) — outputs fx/fy/fz. Same idea as Houdini POP Buoyancy. Makes hot smoke or fire rise. If temperature is not connected it cools down automatically over emitter_age (time since the emitter started) or particle_age (each particle's own age)"
+ },
+ "math": {
+  "name": "Formula",
+  "desc": "Write any formula; it is converted to Molang for you. Has a t (time) input — connect it to another node's strength or radius (Vortex, Attractor…) to animate it over time"
+ },
+ "constant": {
+  "name": "Constant",
+  "desc": "Outputs a single fixed value — a value node for Accumulate's in (increase per second) or init (start value), Formula inputs and so on"
+ },
+ "remap": {
+  "name": "Remap",
+  "desc": "Maps a value from the range [inMin, inMax] to [outMin, outMax] (optional clamp) — same as the Remap/Fit node in Unity and Houdini. An easy way to bring noise or field strength into the range you want"
+ },
+ "dissipationfield": {
+  "name": "Dissipation",
+  "desc": "Exponential fade based on a half-life → outputs out. Models smoke density, heat or alpha thinning out over time (D_t+1 = D_t·(1 − α·Δt)). Connect it to tint.a or size for smoke and embers that fade naturally. The automatic time axis can be emitter_age (time since the emitter started) or particle_age (each particle's own age)"
+ },
+ "accumulate": {
+  "name": "Accumulate",
+  "desc": "Adds up a value over time without storing state (recomputed every frame from the particle id and time) — out = init + ∫ in dt. Use it for \"how much has built up so far\", such as spin angle or distance travelled. Supports clamp, wrap and reset"
+ },
+ "gradient": {
+  "name": "Color Gradient",
+  "desc": "Blends several color stops along t (0–1) → outputs r/g/b. Edit it on a real gradient bar (same idea as the Gradient node in Unity and Houdini)"
+ },
+ "curve": {
+  "name": "Curve (Over-Life)",
+  "desc": "A curve over the particle's life (0–1) → connect it to size, alpha and so on. Draw the curve directly on the graph (tap to add points, drag to move them)"
+ },
+ "flipbook": {
+  "name": "Flipbook UV",
+  "desc": "Plays a texture atlas (a grid of frames) in order over time — outputs u/v/uv_size.w/uv_size.h. Same as Unity \"Texture Sheet Animation\" and Niagara \"Sub UV\". Connect it straight to the Output uv sockets for sprite-sheet animation (explosions, sparks, smoke frames)"
+ },
+ "threshold": {
+  "name": "Threshold / Dissolve",
+  "desc": "Compares a value with a threshold and outputs 0 or 1 (softness smooths the edge) — same as \"Step\" in Shader Graph. Feed it Noise 3D and animate the threshold with a Curve for a dissolve effect that follows the noise pattern. Connect the output to tint.a"
+ },
+ "output": {
+  "name": "Output",
+  "desc": "Maps sockets to Bedrock fields"
+ },
+ "sub_emitter": {
+  "name": "Sub Emitter",
+  "desc": "Same as Emitter plus a bone input. A separate particle effect that is fired by an Event"
+ },
+ "event": {
+  "name": "Event",
+  "desc": "Fire condition (creation / expiration / timeline) + which values to copy → triggers a Sub Emitter"
+ },
+ "particle_event": {
+  "name": "Particle Event",
+  "desc": "Fires on each particle's creation, expiration or timeline → Sub Emitter, sound or Molang (particle_lifetime_events)"
+ }
+}
